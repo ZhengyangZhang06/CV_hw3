@@ -102,40 +102,40 @@ class BoundingBoxesTransform(object):
         :return: the 2D coordinates of the bounding box vertexes
         """
         # Get 3D coordinates of bounding box
-        # bb_cords = BoundingBoxesTransform._create_bb_points(nonplayer)
+        bb_cords = BoundingBoxesTransform._create_bb_points(nonplayer)
         
-        # # Transform the object coordinates to the camera's view
-        # # Get transforms
-        # player_transform = BoundingBoxesTransform._complete_transform(player.get_transform())
-        # nonplayer_transform = BoundingBoxesTransform._complete_transform(nonplayer.get_transform())
-        # camera_transform = BoundingBoxesTransform._complete_transform(camera.get_transform())
+        # Transform the object coordinates to the camera's view
+        # Get transforms
+        player_transform = BoundingBoxesTransform._complete_transform(player.get_transform())
+        nonplayer_transform = BoundingBoxesTransform._complete_transform(nonplayer.get_transform())
+        camera_transform = BoundingBoxesTransform._complete_transform(camera.get_transform())
         
-        # # Use the calibration matrix to project points
-        # K = camera.calibration
+        # Use the calibration matrix to project points
+        K = camera.calibration
         
-        # # Simple projection using camera calibration matrix
-        # screen_coords = np.zeros((8, 2))
-        # rel_z = nonplayer_transform.location.x - player_transform.location.x
-        # rel_y = nonplayer_transform.location.z - player_transform.location.z
-        # rel_x = nonplayer_transform.location.y - player_transform.location.y
-        # for i in range(8):
-        #     point_3d = np.array([bb_cords[i, 0], bb_cords[i, 1], bb_cords[i, 2]])
-        #     point_3d[0] += rel_x
-        #     point_3d[1] -= rel_y
-        #     point_3d[2] += rel_z
-        #     point_homogeneous = np.array([point_3d[0], point_3d[1], point_3d[2], 1.0])
+        # Simple projection using camera calibration matrix
+        screen_coords = np.zeros((8, 2))
+        rel_z = nonplayer_transform.location.x - player_transform.location.x
+        rel_y = nonplayer_transform.location.z - player_transform.location.z
+        rel_x = nonplayer_transform.location.y - player_transform.location.y
+        for i in range(8):
+            point_3d = np.array([bb_cords[i, 0], bb_cords[i, 1], bb_cords[i, 2]])
+            point_3d[0] += rel_x
+            point_3d[1] -= rel_y
+            point_3d[2] += rel_z
+            point_homogeneous = np.array([point_3d[0], point_3d[1], point_3d[2], 1.0])
             
-        #     # Simple perspective division
-        #     depth = max(0.1, point_3d[2])  # avoid division by zero
+            # Simple perspective division
+            depth = max(0.1, point_3d[2])  # avoid division by zero
             
-        #     # Apply calibration matrix
-        #     px = K[0, 0] * (point_3d[0] / depth) + K[0, 2]
-        #     py = K[1, 1] * (point_3d[1] / depth) + K[1, 2]
+            # Apply calibration matrix
+            px = K[0, 0] * (point_3d[0] / depth) + K[0, 2]
+            py = K[1, 1] * (point_3d[1] / depth) + K[1, 2]
             
-        #     screen_coords[i, 0] = px
-        #     screen_coords[i, 1] = py
+            screen_coords[i, 0] = px
+            screen_coords[i, 1] = py
         
-        # return screen_coords
+        return screen_coords
         non_player_ground_bb_points = BoundingBoxesTransform.non_player_ground_bb_points(nonplayer)
         non_player_player_bb_points = BoundingBoxesTransform.ground_bb2player(non_player_ground_bb_points, player)
         non_player_camera_bb_points = BoundingBoxesTransform.player2camera(non_player_player_bb_points, camera)
